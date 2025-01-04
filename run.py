@@ -1,12 +1,7 @@
 import streamlit as st
-import requests
-import os
-from typing import Dict, List, Optional
-from dataclasses import dataclass
+from typing import Dict, List
 import time
-import logging
-from pathlib import Path
-
+from utils import ContentGenerator
 class StreamlitUI:
     def __init__(self):
         self.generator = ContentGenerator()
@@ -73,32 +68,20 @@ class StreamlitUI:
                             options["style"]
                         )
                         st.success("✅ Learning path created!")
-                        st.text_area("Storyline Preview:", storyline, height=150)
+                        # st.text_area("Storyline Preview:", storyline, height=150)
 
                     with st.spinner("🎨 Creating visual elements..."):
                         prompts = storyline.split("\n\n")
                         images = self.generator.generate_images(prompts)
                         st.success("✅ Visuals generated!")
                         
-                        # Display image previews
-                        cols = st.columns(len(images))
-                        for col, img in zip(cols, images):
-                            with col:
-                                st.image("https://via.placeholder.com/150", 
-                                        caption=f"Scene {images.index(img) + 1}")
 
                     with st.spinner("🎵 Generating narration..."):
                         audio = self.generator.generate_audio(storyline)
                         st.success("✅ Audio narration ready!")
 
                     with st.spinner("🎬 Composing final video..."):
-                        content = VideoContent(
-                            topic=topic,
-                            storyline=storyline,
-                            images=images,
-                            audio_path=audio
-                        )
-                        video_path = self.generator.create_video(content)
+                        video_path = self.generator.create_video(topic=topic,storyline=storyline,images=images, audio_path=audio)
                         st.success("✅ Your learning video is ready!")
 
                     # Final video display
