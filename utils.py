@@ -2,6 +2,7 @@ from config import Config
 import torch,os,shutil
 from moviepy.editor import ImageClip, AudioFileClip, concatenate_videoclips, TextClip, CompositeVideoClip
 import ast,google.generativeai as genai,torch,soundfile as sf,os
+from langchain.chat_models import Groq
 
 class ContentGenerator():
     def __init__(self):
@@ -9,25 +10,47 @@ class ContentGenerator():
         self.config.initialize_models()
     
     def generate_prompts(self,topic,style):
-        model = genai.GenerativeModel('gemini-pro')
+        # model = genai.GenerativeModel('gemini-pro')
+        # prompt = f"""
+        # Create a  engaging story that explains {topic} using superheroes or other fictional characters. The story should be educational and easy for students to understand. Break down the story into frames. Each frame should be a dictionary with two keys: 'image_prompt' for the image description and 'narrator' for the accompanying text. Return the response as a list of dictionaries, like this: 
+        # [
+        #     {{'image_prompt': 'description of image 1', 'narrator': 'text for image 1'}},
+        #     {{'image_prompt': 'description of image 2', 'narrator': 'text for image 2'}}
+        # ]
+        # At the end, make a strong connection to the actual concept of {topic} and conclude the story effectively.Also make scientific and theoretical explanations where needed and make narrations very detailed. No additional text or commentary is needed.
+        # """    
+        # response = model.generate_content(prompt)
+
+        
+        # story_and_prompts = ast.literal_eval(response.text)
+    
+        # image_prompts = [frame['image_prompt'] for frame in story_and_prompts]
+        # narrators = [frame['narrator'] for frame in story_and_prompts]
+
+        # return image_prompts, narrators
+        model = Groq()
+    
+        # Create the prompt for the Groq model
         prompt = f"""
-        Create a  engaging story that explains {topic} using superheroes or other fictional characters. The story should be educational and easy for students to understand. Break down the story into frames. Each frame should be a dictionary with two keys: 'image_prompt' for the image description and 'narrator' for the accompanying text. Return the response as a list of dictionaries, like this: 
+        Create an engaging story that explains {topic} using superheroes or other fictional characters. The story should be educational and easy for students to understand. Break down the story into frames. Each frame should be a dictionary with two keys: 'image_prompt' for the image description and 'narrator' for the accompanying text. Return the response as a list of dictionaries, like this: 
         [
             {{'image_prompt': 'description of image 1', 'narrator': 'text for image 1'}},
             {{'image_prompt': 'description of image 2', 'narrator': 'text for image 2'}}
         ]
-        At the end, make a strong connection to the actual concept of {topic} and conclude the story effectively.Also make scientific and theoretical explanations where needed and make narrations very detailed. No additional text or commentary is needed.
-        """    
-        response = model.generate_content(prompt)
-
+        At the end, make a strong connection to the actual concept of {topic} and conclude the story effectively. Also make scientific and theoretical explanations where needed and make narrations very detailed. No additional text or commentary is needed.
+        """
         
-        story_and_prompts = ast.literal_eval(response.text)
-    
+        # Generate content using the Groq model
+        response = model.generate_content(prompt)
+        
+        # Parse the generated response
+        story_and_prompts = ast.literal_eval(response['text'])
+        
+        # Extract image prompts and narrators
         image_prompts = [frame['image_prompt'] for frame in story_and_prompts]
         narrators = [frame['narrator'] for frame in story_and_prompts]
 
         return image_prompts, narrators
-
     def generate_images(self,prompts):
         folder_name = "images"
 

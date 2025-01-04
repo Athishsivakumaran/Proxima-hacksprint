@@ -11,8 +11,8 @@ class Config:
     def __init__(self):
         self.speech_to_text={"processor":None,"model":None,"vocoder":None}
         self.image_generate_pipe=None
-        self.text_generator=None
-        
+        self.text_generator_client=None
+
     def initialize_models(self):
         # Initialize the SpeechT5 models
         self.speech_to_text["processor"]=SpeechT5Processor.from_pretrained("microsoft/speecht5_tts")
@@ -23,3 +23,4 @@ class Config:
         self.image_generate_pipe = FluxPipeline.from_pretrained("black-forest-labs/FLUX.1-schnell", torch_dtype=torch.bfloat16)
         self.image_generate_pipe.to("cuda")
 
+        self.text_generator_client=
