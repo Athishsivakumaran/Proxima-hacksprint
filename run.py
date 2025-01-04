@@ -7,76 +7,6 @@ import time
 import logging
 from pathlib import Path
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Data structures
-@dataclass
-class VideoContent:
-    topic: str
-    storyline: str
-    images: List[str]
-    audio_path: str
-    video_path: Optional[str] = None
-
-class ContentGenerator:
-    def __init__(self):
-        self.api_keys = self._load_api_keys()
-        
-    def _load_api_keys(self) -> Dict[str, str]:
-        """Load API keys from environment variables."""
-        return {
-            'gemini_api_key': os.getenv('GEMINI_API_KEY'),
-            'flux_api_key': os.getenv('FLUX_API_KEY'),
-            'ms_tts_api_key': os.getenv('MS_TTS_API_KEY')
-        }
-
-    def generate_storyline(self, topic: str, style: str = "educational") -> str:
-        """Generate a structured storyline using Gemini API."""
-        try:
-            # Add proper API implementation here
-            logger.info(f"Generating storyline for topic: {topic}")
-            # Simulate API call delay
-            time.sleep(2)
-            return f"Introduction to {topic}\n\n" \
-                   f"1. Key Concepts of {topic}\n" \
-                   f"2. Real-world applications\n" \
-                   f"3. Practice exercises"
-        except Exception as e:
-            logger.error(f"Error generating storyline: {e}")
-            raise
-
-    def generate_images(self, prompts: List[str]) -> List[str]:
-        """Generate images for each section of the storyline."""
-        try:
-            # Add proper Flux API implementation here
-            logger.info(f"Generating {len(prompts)} images")
-            return [f"image_{i}.jpg" for i in range(len(prompts))]
-        except Exception as e:
-            logger.error(f"Error generating images: {e}")
-            raise
-
-    def generate_audio(self, text: str, voice: str = "natural") -> str:
-        """Generate audio narration using Microsoft TTS."""
-        try:
-            # Add proper MS TTS API implementation here
-            logger.info("Generating audio narration")
-            return "narration.mp3"
-        except Exception as e:
-            logger.error(f"Error generating audio: {e}")
-            raise
-
-    def create_video(self, content: VideoContent) -> str:
-        """Combine images and audio into a video."""
-        try:
-            # Add video creation logic here
-            logger.info("Creating final video")
-            return "output_video.mp4"
-        except Exception as e:
-            logger.error(f"Error creating video: {e}")
-            raise
-
 class StreamlitUI:
     def __init__(self):
         self.generator = ContentGenerator()
@@ -96,19 +26,9 @@ class StreamlitUI:
             st.header("Customization Options")
             style = st.selectbox(
                 "Learning Style",
-                ["Visual", "Auditory", "Interactive"]
+                ["Fictional", "Study"]
             )
-            difficulty = st.select_slider(
-                "Content Difficulty",
-                options=["Beginner", "Intermediate", "Advanced"]
-            )
-            duration = st.slider(
-                "Video Duration (minutes)",
-                min_value=1,
-                max_value=15,
-                value=5
-            )
-            return {"style": style, "difficulty": difficulty, "duration": duration}
+            return {"style": style}
 
     def show_progress(self, message: str) -> None:
         """Display progress bar with message."""
