@@ -1,6 +1,7 @@
 from config import Config
 import torch,os,shutil
 from moviepy.editor import ImageClip, AudioFileClip, concatenate_videoclips, TextClip, CompositeVideoClip
+import ast,google.generativeai as genai,torch,soundfile as sf,os
 
 class ContentGenerator():
     def __init__(self):
@@ -40,15 +41,14 @@ class ContentGenerator():
                 guidance_scale=0.0,
                 num_inference_steps=4,
                 max_sequence_length=128,
-                generator=torch.Generator("cuda").manual_seed(0)
-            ).images[0]
+                generator=torch.Generator("cuda").manual_seed(0)).images[0]
             image.save(os.path.join(folder_name, f"flux-schnell_{i}.png"),f"flux-schnell_{i}.png")
     def generate_audio(self,storyline):
         for i in  range(len(storyline)):
-            inputs = processor(text=storyline[i], return_tensors="pt")
+            inputs =  self.config.speech_to_text["processor"](text=storyline[i], return_tensors="pt")
             embeddings_dataset = load_dataset("Matthijs/cmu-arctic-xvectors", split="validation")
             speaker_embeddings = torch.tensor(embeddings_dataset[7306]["xvector"]).unsqueeze(0)
-            speech = model.generate_speech(inputs["input_ids"], speaker_embeddings, vocoder=vocoder)
+            speech = self.config.speech_to_text["model"].generate_speech(inputs["input_ids"], speaker_embeddings, vocoder=self.config.speech_to_text["vocoder"])
             sf.write(f"speech{i}.wav", speech.numpy(), samplerate=16000)
     
     
